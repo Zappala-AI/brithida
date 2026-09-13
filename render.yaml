@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: brithida
+    runtime: node
+    plan: starter
+    buildCommand: ""
+    startCommand: "node server.mjs"
+    healthCheckPath: /
+    envVars:
+      - key: BRITHIDA_ADMIN_PASSWORD
+        sync: false
+      - key: BRITHIDA_DATA_DIR
+        value: /var/data
+    disk:
+      name: brithida-data
+      mountPath: /var/data
+      sizeGB: 1
