@@ -1,0 +1,61 @@
+{
+  "config": {
+    "whatsappPhone": "5492644118290",
+    "instagramUrl": "#",
+    "facebookUrl": "#",
+    "deliveryNote": "El costo se confirma según tu zona.",
+    "localAddress": "",
+    "localHours": "11:00 a 15:00 / 21:00 a 02:30",
+    "pickupText": "También podés consultar por retiro en el local."
+  },
+  "products": [
+    {
+      "id": "pollo",
+      "category": "Pollos",
+      "name": "Pollo asado",
+      "description": "Dorado, jugoso y listo para compartir.",
+      "price": 8500,
+      "emoji": "🍗",
+      "tone": "gold"
+    },
+    {
+      "id": "empanadas",
+      "category": "Empanadas",
+      "name": "Empanadas x6",
+      "description": "Masa casera y relleno abundante.",
+      "price": 6000,
+      "emoji": "🥟",
+      "tone": "rose"
+    },
+    {
+      "id": "burger",
+      "category": "Hamburguesas",
+      "name": "Burger completa",
+      "description": "Carne, queso, lechuga, tomate y papas.",
+      "price": 6500,
+      "emoji": "🍔",
+      "tone": "brown"
+    },
+    {
+      "id": "papas",
+      "category": "Acompañamientos",
+      "name": "Papas fritas",
+      "description": "Crocantes, doradas y para compartir.",
+      "price": 2800,
+      "emoji": "🍟",
+      "tone": "yellow"
+    },
+    {
+      "id": "producto-1789329282040",
+      "category": "panchos",
+      "name": "panchos",
+      "description": "Descripción del producto.",
+      "price": 3500,
+      "emoji": "🍽️",
+      "tone": "gold"
+    }
+  ],
+  "promos": [],
+  "orders": [],
+  "adminPasswordHash": "f1dd843dfc9501f8d7eb0c082d6fd74974244b9cce2f59732c4e175be87507cf"
+}
