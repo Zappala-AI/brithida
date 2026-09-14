@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="BRITHIDA: comida casera, abundante y rica en San Juan. Pollo asado, empanadas, hamburguesas, papas y delivery.">
+  <meta name="keywords" content="BRITHIDA, pollo asado San Juan, empanadas San Juan, hamburguesas San Juan, delivery San Juan, comida a domicilio San Juan">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="restaurant">
+  <meta property="og:title" content="BRITHIDA | Comida casera en San Juan">
+  <meta property="og:description" content="Pollo asado, empanadas, hamburguesas y delivery en San Juan.">
+  <meta property="og:locale" content="es_AR">
+  <meta name="theme-color" content="#f45b2a">
+  <title>BRITHIDA | Sabor que llega a tu mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>.header-actions{display:flex;gap:10px;align-items:center}.admin-trigger,.mini-button{border:1px solid #eadfd2;background:transparent;color:#766f67;border-radius:999px;padding:10px 13px;font-size:12px;font-weight:800;cursor:pointer}.admin-trigger:hover,.mini-button:hover{background:#fff}.admin-products{display:grid;gap:8px;max-height:260px;overflow:auto;padding:2px}.admin-product{display:grid;grid-template-columns:1.2fr .9fr .7fr 1.4fr 30px;gap:5px;align-items:center}.admin-product input{min-width:0;padding:9px;font-size:12px;margin:0}.remove-product{border:0;background:#ffe0d8;color:#c64224;border-radius:50%;height:26px;cursor:pointer}.admin-product-head{display:flex;justify-content:space-between;align-items:center;margin-top:8px}.admin-status{font-size:12px;color:#2f8060;margin:0}@media(max-width:650px){.admin-trigger{font-size:0;padding:10px}.admin-trigger:first-letter{font-size:14px}.admin-product{grid-template-columns:1fr 1fr 30px}.admin-product input:nth-child(3){grid-column:1}.admin-product input:nth-child(4){grid-column:2}.remove-product{grid-column:3;grid-row:1}.admin-product input:nth-child(1),.admin-product input:nth-child(2){grid-row:1}.header-actions{gap:6px}}</style>
+</head>
+<body>
+  <div class="announcement">🔥 Pedí algo rico para hoy · Delivery en San Juan</div>
+  <header class="site-header">
+    <a class="brand" href="#inicio" aria-label="BRITHIDA inicio"><span class="brand-mark">B</span><span>BRITHIDA</span></a>
+    <nav class="desktop-nav" aria-label="Navegación principal">
+      <a href="#menu">Menú</a><a href="#promos">Promos</a><a href="#delivery">Delivery</a><a href="#contacto">Contacto</a>
+    </nav>
+    <button class="cart-trigger" id="openCart" type="button" aria-label="Abrir pedido">Pedido <span id="cartCount">0</span></button>
+  </header>
+
+  <main>
+    <section class="hero" id="inicio">
+      <div class="hero-copy">
+        <p class="eyebrow">COMIDA CASERA · SAN JUAN</p>
+        <h1>Sabor que llega<br><em>a tu mesa.</em></h1>
+        <p class="hero-lead">Pollo asado, empanadas y hamburguesas hechas para compartir. Abundante, casero y con ese gustito que te pide repetir.</p>
+        <div class="hero-actions"><a class="button button-primary" href="#menu">Ver el menú <span>↓</span></a><a class="text-link" href="#contacto">Hablá con BRITHIDA →</a></div>
+        <div class="hero-meta"><span>📍 San Juan, Argentina</span><span>🛵 Hacemos delivery</span></div>
+      </div>
+      <div class="hero-art" aria-label="Imagen demo de comida de BRITHIDA">
+        <div class="stamp">HECHO<br>CON GANAS</div><div class="hero-plate">🍗</div><div class="hero-fries">🍟</div><div class="hero-sauce">🔥</div><small>IMAGEN DEMO · REEMPLAZABLE</small>
+      </div>
+    </section>
+
+    <section class="trust-strip"><span>⭐ Sabor casero</span><span>🍽️ Porciones abundantes</span><span>🛵 Delivery en San Juan</span><span>💛 Hecho con ganas</span></section>
+
+    <section class="section" id="promos">
+      <div class="section-heading"><div><p class="eyebrow">PARA COMPARTIR</p><h2>Hoy pinta <em>combo.</em></h2></div><span class="heading-note">Ofertas destacadas</span></div>
+      <div class="promo-grid" id="promoGrid">
+        <article class="promo-card promo-orange"><div><span class="promo-label">PROMO DE LA CASA</span><h3>Pollo + papas<br>para compartir</h3><p>El clásico que nunca falla.</p><a href="#menu" class="promo-link">Lo quiero →</a></div><div class="promo-emoji">🍗</div></article>
+        <article class="promo-card promo-dark"><div><span class="promo-label">NUEVO</span><h3>La burger<br>que faltaba</h3><p>Probá nuestra completa.</p><a href="#menu" class="promo-link">Ver hamburguesas →</a></div><div class="promo-emoji">🍔</div></article>
+      </div>
+    </section>
+
+    <section class="section menu-section" id="menu">
+      <div class="section-heading"><div><p class="eyebrow">ELEGÍ TU FAVORITO</p><h2>Nuestro <em>menú.</em></h2></div><p class="section-intro">Todo preparado en el día.<br>Elegí, sumá al pedido y listo.</p></div>
+      <div class="category-tabs" id="categoryTabs" role="tablist"></div><div class="product-grid" id="productGrid"></div>
+    </section>
+
+    <section class="how-section" id="como-pedir"><div class="section-heading"><div><p class="eyebrow">ASÍ DE SIMPLE</p><h2>Pedí en <em>3 pasos.</em></h2></div></div><div class="steps"><div class="step"><span>01</span><h3>Elegí</h3><p>Explorá el menú y agregá tus favoritos al pedido.</p></div><div class="step"><span>02</span><h3>Completá</h3><p>Contanos cómo te llamás y dónde te llevamos la comida.</p></div><div class="step"><span>03</span><h3>Disfrutá</h3><p>Confirmamos por WhatsApp y preparamos todo para vos.</p></div></div></section>
+
+    <section class="delivery-section" id="delivery"><div class="delivery-icon">🛵</div><div><p class="eyebrow">LLEGAMOS A VOS</p><h2>Delivery en <em>San Juan.</em></h2><p id="deliveryCopy">El costo depende de tu zona y te lo confirmamos al recibir tu pedido.</p><p id="pickupCopy">También podés consultar por retiro en el local.</p><p id="hoursCopy"></p></div><a class="button button-light" href="#contacto">Consultar zona</a></section>
+
+    <section class="contact-section" id="contacto"><p class="eyebrow">¿TENÉS HAMBRE?</p><h2>Hablá con<br><em>BRITHIDA.</em></h2><p id="contactInfo">San Juan, Argentina 🇦🇷<br>🛵 Delivery y pedidos por WhatsApp</p><p id="whatsappDisplay" class="config-note"></p><a class="button button-primary" id="contactButton" href="#">💬 Configurar WhatsApp</a><p class="config-note" id="configNote">El número de WhatsApp se configura en el panel privado.</p></section>
+  </main>
+
+  <footer><div class="brand"><span class="brand-mark">B</span><span>BRITHIDA</span></div><p>Comida rica, hecha con ganas.</p><div class="socials"><a href="#" aria-label="Instagram">Instagram</a><a href="#" aria-label="Facebook">Facebook</a><a href="#contacto">WhatsApp</a></div><small>© 2026 BRITHIDA · San Juan, Argentina · <a href="admin.html" style="color:#777;text-decoration:none;font-size:10px">Acceso administrador</a></small></footer>
+
+  <div class="cart-overlay" id="cartOverlay" hidden></div><aside class="cart-drawer" id="cartDrawer" aria-label="Tu pedido" aria-hidden="true"><div class="drawer-head"><div><p class="eyebrow">BRITHIDA</p><h2>Tu pedido <span id="drawerCount">(0)</span></h2></div><button class="close-button" id="closeCart" type="button" aria-label="Cerrar">×</button></div><div id="cartLines" class="cart-lines"></div><div class="cart-footer"><div class="total-row"><span>Subtotal</span><strong id="cartSubtotal">$0</strong></div><p class="delivery-hint">🛵 Delivery: se confirma según tu zona</p><button class="button button-primary full" id="checkoutButton" type="button">Continuar pedido →</button></div></aside>
+
+
+  <dialog id="checkoutDialog"><form method="dialog" id="checkoutForm"><button class="close-button dialog-close" value="cancel" aria-label="Cerrar">×</button><p class="eyebrow">ÚLTIMO PASO</p><h2>¿A dónde te lo llevamos?</h2><p class="dialog-intro">Completá tus datos y se abrirá WhatsApp con el pedido listo para enviar.</p><label>Nombre<input required name="name" autocomplete="name" placeholder="Tu nombre"></label><label>Teléfono<input required name="phone" type="tel" autocomplete="tel" placeholder="Tu teléfono"></label><label>Entrega<select name="delivery"><option value="Delivery">Delivery</option><option value="Retiro en el local">Retiro en el local</option></select></label><label>Dirección<input required name="address" autocomplete="street-address" placeholder="Calle, número y barrio"></label><label>Forma de pago<select name="payment"><option>Efectivo</option><option>Transferencia</option><option>Mercado Pago (a confirmar)</option></select></label><label>Observaciones<textarea name="notes" placeholder="Ej: sin picante, timbre..."></textarea></label><button class="button button-primary full" value="submit">Enviar pedido por WhatsApp →</button></form></dialog>
+  <script src="app.js"></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Restaurant","name":"BRITHIDA","description":"Comida casera, pollo asado, empanadas, hamburguesas y delivery en San Juan, Argentina.","servesCuisine":"Comida argentina","address":{"@type":"PostalAddress","addressLocality":"San Juan","addressCountry":"AR"},"areaServed":"San Juan, Argentina","url":"https://brithida.com.ar"}</script>
+</body>
+</html>
