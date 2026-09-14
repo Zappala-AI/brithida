@@ -10,6 +10,17 @@ if (hoursInput && hoursInput.tagName === 'INPUT') {
   hoursEditor.placeholder = 'Ejemplo:\n11:00 a 15:00\n21:00 a 02:30';
   hoursInput.replaceWith(hoursEditor);
 }
+function ensureSiteEditor() {
+  if ($('#siteEditor')) return;
+  const card = document.createElement('div');
+  card.className = 'admin-card'; card.id = 'siteEditor';
+  card.innerHTML = `<p class="eyebrow">CONTENIDO DE LA PÁGINA</p><h2>Editá la portada y la imagen principal</h2><p class="admin-muted">Estos textos y la imagen se muestran en la tienda pública.</p><div class="admin-grid"><label>Anuncio superior<input id="announcement" placeholder="🔥 Pedí algo rico para hoy"></label><label>Texto pequeño de portada<input id="heroEyebrow" placeholder="COMIDA CASERA · SAN JUAN"></label><label>Título principal<input id="heroTitle" placeholder="Sabor que llega"></label><label>Parte destacada del título<input id="heroTitleAccent" placeholder="a tu mesa."></label><label>Descripción principal<textarea id="heroLead" rows="3" placeholder="Contá qué ofrecés y por qué elegirte."></textarea></label><label>Ubicación de portada<input id="heroLocation" placeholder="San Juan, Argentina"></label><label>Imagen grande de presentación<input id="heroImageInput" type="file" accept="image/png,image/jpeg,image/webp"><small id="heroImageStatus" class="admin-muted"></small></label></div><div id="heroImagePreview" hidden></div>`;
+  $('#panelView').insertBefore(card, $('#panelView').lastElementChild);
+  $('#heroImageInput').onchange = () => {
+    const file = $('#heroImageInput').files[0]; if (!file) return;
+    const reader = new FileReader(); reader.onload = async () => { try { const saved = await api('/api/admin/image', { method: 'POST', body: JSON.stringify({ filename: file.name, dataUrl: reader.result }) }); store.config.heroImage = saved.url; $('#heroImageStatus').textContent = 'Imagen cargada ✓'; $('#heroImagePreview').hidden = false; $('#heroImagePreview').innerHTML = `<img src="${saved.url}" alt="Vista previa" style="max-width:240px;border-radius:14px;margin-top:12px">`; } catch (error) { alert(error.message); } }; reader.readAsDataURL(file);
+  };
+}
 async function api(url, options = {}) {
   const response = await fetch(url, { credentials: 'include', headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
   const data = await response.json().catch(() => ({}));
@@ -48,11 +59,11 @@ async function refreshOrders(showNotification = true) {
 }
 async function load() {
   store = await api('/api/store');
-  $('#phone').value = store.config.whatsappPhone || ''; $('#instagram').value = store.config.instagramUrl || ''; $('#facebook').value = store.config.facebookUrl || ''; $('#delivery').value = store.config.deliveryNote || ''; $('#localAddress').value = store.config.localAddress || ''; $('#localHours').value = store.config.localHours || ''; $('#pickupText').value = store.config.pickupText || '';
+  $('#phone').value = store.config.whatsappPhone || ''; $('#instagram').value = store.config.instagramUrl || ''; $('#facebook').value = store.config.facebookUrl || ''; $('#delivery').value = store.config.deliveryNote || ''; $('#localAddress').value = store.config.localAddress || ''; $('#localHours').value = store.config.localHours || ''; $('#pickupText').value = store.config.pickupText || ''; $('#announcement').value = store.config.announcement || ''; $('#heroEyebrow').value = store.config.heroEyebrow || ''; $('#heroTitle').value = store.config.heroTitle || ''; $('#heroTitleAccent').value = store.config.heroTitleAccent || ''; $('#heroLead').value = store.config.heroLead || ''; $('#heroLocation').value = store.config.heroLocation || ''; if (store.config.heroImage) { $('#heroImageStatus').textContent = 'Imagen cargada ✓'; $('#heroImagePreview').hidden = false; $('#heroImagePreview').innerHTML = `<img src="${store.config.heroImage}" alt="Vista previa" style="max-width:240px;border-radius:14px;margin-top:12px">`; }
   renderProducts(); renderPromos(); await refreshOrders(false); if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); setInterval(() => refreshOrders(true), 10000);
 }
 async function showPanel() {
-  try { const session = await api('/api/admin/session'); if (!session.authenticated) return; $('#loginView').hidden = true; $('#panelView').hidden = false; await load(); } catch { /* mostrar login */ }
+  try { const session = await api('/api/admin/session'); if (!session.authenticated) return; $('#loginView').hidden = true; $('#panelView').hidden = false; ensureSiteEditor(); await load(); } catch { /* mostrar login */ }
 }
 $('#loginForm').onsubmit = async event => { event.preventDefault(); try { await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ password: new FormData(event.target).get('password') }) }); await showPanel(); } catch (error) { $('#loginError').textContent = error.message; } };
 $('#addProduct').onclick = () => { store.products.push({ id: `producto-${Date.now()}`, category: 'Otros', name: 'Nuevo producto', description: 'Descripción del producto.', price: 0, emoji: '🍽️', tone: 'gold' }); renderProducts(); };
@@ -64,7 +75,7 @@ $('#save').onclick = async () => {
     store.config.whatsappPhone = $('#phone').value.trim();
     store.config.instagramUrl = cleanUrl($('#instagram').value);
     store.config.facebookUrl = cleanUrl($('#facebook').value);
-    store.config.deliveryNote = $('#delivery').value.trim(); store.config.localAddress = $('#localAddress').value.trim(); store.config.localHours = $('#localHours').value.trim(); store.config.pickupText = $('#pickupText').value.trim();
+    store.config.deliveryNote = $('#delivery').value.trim(); store.config.localAddress = $('#localAddress').value.trim(); store.config.localHours = $('#localHours').value.trim(); store.config.pickupText = $('#pickupText').value.trim(); store.config.announcement = $('#announcement').value.trim(); store.config.heroEyebrow = $('#heroEyebrow').value.trim(); store.config.heroTitle = $('#heroTitle').value.trim(); store.config.heroTitleAccent = $('#heroTitleAccent').value.trim(); store.config.heroLead = $('#heroLead').value.trim(); store.config.heroLocation = $('#heroLocation').value.trim();
     await api('/api/admin/store', { method: 'POST', body: JSON.stringify({ config: store.config, products: store.products, promos: store.promos }) });
     const currentPassword = $('#currentPassword').value; const newPassword = $('#newPassword').value;
     if (newPassword) { await api('/api/admin/password', { method: 'POST', body: JSON.stringify({ currentPassword, newPassword }) }); $('#currentPassword').value = ''; $('#newPassword').value = ''; }

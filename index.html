@@ -19,7 +19,7 @@
   <style>.header-actions{display:flex;gap:10px;align-items:center}.admin-trigger,.mini-button{border:1px solid #eadfd2;background:transparent;color:#766f67;border-radius:999px;padding:10px 13px;font-size:12px;font-weight:800;cursor:pointer}.admin-trigger:hover,.mini-button:hover{background:#fff}.admin-products{display:grid;gap:8px;max-height:260px;overflow:auto;padding:2px}.admin-product{display:grid;grid-template-columns:1.2fr .9fr .7fr 1.4fr 30px;gap:5px;align-items:center}.admin-product input{min-width:0;padding:9px;font-size:12px;margin:0}.remove-product{border:0;background:#ffe0d8;color:#c64224;border-radius:50%;height:26px;cursor:pointer}.admin-product-head{display:flex;justify-content:space-between;align-items:center;margin-top:8px}.admin-status{font-size:12px;color:#2f8060;margin:0}@media(max-width:650px){.admin-trigger{font-size:0;padding:10px}.admin-trigger:first-letter{font-size:14px}.admin-product{grid-template-columns:1fr 1fr 30px}.admin-product input:nth-child(3){grid-column:1}.admin-product input:nth-child(4){grid-column:2}.remove-product{grid-column:3;grid-row:1}.admin-product input:nth-child(1),.admin-product input:nth-child(2){grid-row:1}.header-actions{gap:6px}}</style>
 </head>
 <body>
-  <div class="announcement">🔥 Pedí algo rico para hoy · Delivery en San Juan</div>
+  <div class="announcement" id="announcementBar">🔥 Pedí algo rico para hoy · Delivery en San Juan</div>
   <header class="site-header">
     <a class="brand" href="#inicio" aria-label="BRITHIDA inicio"><span class="brand-mark">B</span><span>BRITHIDA</span></a>
     <nav class="desktop-nav" aria-label="Navegación principal">
@@ -31,14 +31,15 @@
   <main>
     <section class="hero" id="inicio">
       <div class="hero-copy">
-        <p class="eyebrow">COMIDA CASERA · SAN JUAN</p>
-        <h1>Sabor que llega<br><em>a tu mesa.</em></h1>
-        <p class="hero-lead">Pollo asado, empanadas y hamburguesas hechas para compartir. Abundante, casero y con ese gustito que te pide repetir.</p>
+        <p class="eyebrow" id="heroEyebrow">COMIDA CASERA · SAN JUAN</p>
+        <h1><span id="heroTitle">Sabor que llega</span><br><em id="heroTitleAccent">a tu mesa.</em></h1>
+        <p class="hero-lead" id="heroLead">Pollo asado, empanadas y hamburguesas hechas para compartir. Abundante, casero y con ese gustito que te pide repetir.</p>
         <div class="hero-actions"><a class="button button-primary" href="#menu">Ver el menú <span>↓</span></a><a class="text-link" href="#contacto">Hablá con BRITHIDA →</a></div>
         <div class="hero-meta"><span>📍 San Juan, Argentina</span><span>🛵 Hacemos delivery</span></div>
       </div>
-      <div class="hero-art" aria-label="Imagen demo de comida de BRITHIDA">
-        <div class="stamp">HECHO<br>CON GANAS</div><div class="hero-plate">🍗</div><div class="hero-fries">🍟</div><div class="hero-sauce">🔥</div><small>IMAGEN DEMO · REEMPLAZABLE</small>
+      <div class="hero-art" aria-label="Imagen de presentación de BRITHIDA">
+        <img id="heroImage" class="hero-image" alt="Imagen de presentación de BRITHIDA" hidden>
+        <div class="hero-placeholder"><div class="stamp">HECHO<br>CON GANAS</div><div class="hero-plate">🍗</div><div class="hero-fries">🍟</div><div class="hero-sauce">🔥</div><small>IMAGEN DEMO · REEMPLAZABLE</small></div>
       </div>
     </section>
 
