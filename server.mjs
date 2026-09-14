@@ -30,6 +30,16 @@ function cookies(req) { return Object.fromEntries((req.headers.cookie || '').spl
 function isAdmin(req) { const token = cookies(req).brithida_session; return Boolean(token && sessions.has(token)); }
 async function readBody(req) { let raw = ''; for await (const chunk of req) raw += chunk; if (raw.length > 12_000_000) throw new Error('Payload too large'); return raw ? JSON.parse(raw) : {}; }
 function safeName(name) { return String(name || 'image').replace(/[^a-z0-9._-]/gi, '_').slice(-100); }
+function orderMessage(order) { return `🛎️ NUEVO PEDIDO BRITHIDA\n\n${(order.items || []).join('\n')}\n\nTotal: ${order.total || ''}\nEntrega: ${order.delivery || ''}\nNombre: ${order.name || ''}\nTeléfono: ${order.phone || ''}\nDirección: ${order.address || ''}\nPago: ${order.payment || ''}\nObservaciones: ${order.notes || 'Ninguna'}`; }
+async function sendWhatsAppOrder(order, storeData) {
+  const token = process.env.WHATSAPP_ACCESS_TOKEN || '';
+  const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
+  const recipient = String(storeData.config.whatsappPhone || '').replace(/\D/g, '');
+  if (!token || !phoneNumberId || !recipient) return { sent: false, configured: false };
+  const response = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/messages`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ messaging_product: 'whatsapp', to: recipient, type: 'text', text: { preview_url: false, body: orderMessage(order) } }) });
+  if (!response.ok) { const detail = await response.text(); console.error('WhatsApp Cloud API:', response.status, detail); return { sent: false, configured: true }; }
+  return { sent: true, configured: true };
+}
 
 async function serveStatic(req, res) {
   let pathname = new URL(req.url, `http://${req.headers.host}`).pathname;
@@ -62,7 +72,7 @@ async function main() {
       if (req.method === 'POST' && url.pathname === '/api/admin/store') { if (!isAdmin(req)) return sendJson(res, 401, { error: 'No autorizado' }); const body = await readBody(req); data.config = { ...data.config, ...(body.config || {}) }; if (Array.isArray(body.products)) data.products = body.products; if (Array.isArray(body.promos)) data.promos = body.promos; await writeData(data); return sendJson(res, 200, { ok: true }); }
       if (req.method === 'POST' && url.pathname === '/api/admin/password') { if (!isAdmin(req)) return sendJson(res, 401, { error: 'No autorizado' }); const body = await readBody(req); if (!body.newPassword || String(body.newPassword).length < 8) return sendJson(res, 400, { error: 'La nueva contraseña debe tener al menos 8 caracteres' }); if (hash(body.currentPassword) !== passwordHash) return sendJson(res, 401, { error: 'Contraseña actual incorrecta' }); passwordHash = hash(body.newPassword); data.adminPasswordHash = passwordHash; await writeData(data); return sendJson(res, 200, { ok: true }); }
       if (req.method === 'POST' && url.pathname === '/api/admin/image') { if (!isAdmin(req)) return sendJson(res, 401, { error: 'No autorizado' }); const body = await readBody(req); const match = String(body.dataUrl || '').match(/^data:(image\/(?:png|jpeg|webp));base64,(.+)$/); if (!match) return sendJson(res, 400, { error: 'Imagen inválida' }); const extension = match[1].split('/')[1].replace('jpeg', 'jpg'); const filename = `${Date.now()}-${safeName(body.filename || 'imagen')}.${extension}`; await fs.writeFile(path.join(uploadsDir, filename), Buffer.from(match[2], 'base64')); return sendJson(res, 200, { url: `/uploads/${filename}` }); }
-      if (req.method === 'POST' && url.pathname === '/api/orders') { const body = await readBody(req); data.orders.push({ ...body, createdAt: new Date().toISOString() }); await writeData(data); return sendJson(res, 200, { ok: true }); }
+      if (req.method === 'POST' && url.pathname === '/api/orders') { const body = await readBody(req); const order = { ...body, createdAt: new Date().toISOString() }; data.orders.push(order); await writeData(data); let whatsapp = { sent: false, configured: false }; try { whatsapp = await sendWhatsAppOrder(order, data); } catch (error) { console.error('No se pudo enviar el pedido por WhatsApp:', error.message); } return sendJson(res, 200, { ok: true, whatsapp }); }
       return serveStatic(req, res);
     } catch (error) { console.error(error); return sendJson(res, 500, { error: 'Error interno' }); }
   });
