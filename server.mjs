@@ -34,7 +34,9 @@ function orderMessage(order) { return `🛎️ NUEVO PEDIDO BRITHIDA\n\n${(order
 async function sendWhatsAppOrder(order, storeData) {
   const token = process.env.WHATSAPP_ACCESS_TOKEN || '';
   const phoneNumberId = process.env.WHATSAPP_PHONE_NUMBER_ID || '';
-  const recipient = String(process.env.WHATSAPP_RECIPIENT_PHONE || storeData.config.whatsappPhone || '').replace(/\D/g, '');
+  // El número del panel es la fuente principal: al cambiarlo, también cambia
+  // automáticamente el destinatario de los pedidos enviados por la API.
+  const recipient = String(storeData.config.whatsappPhone || process.env.WHATSAPP_RECIPIENT_PHONE || '').replace(/\D/g, '');
   if (!token || !phoneNumberId || !recipient) return { sent: false, configured: false };
   const response = await fetch(`https://graph.facebook.com/v22.0/${phoneNumberId}/messages`, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ messaging_product: 'whatsapp', to: recipient, type: 'text', text: { preview_url: false, body: orderMessage(order) } }) });
   if (!response.ok) { const detail = await response.text(); console.error('WhatsApp Cloud API:', response.status, detail); return { sent: false, configured: true }; }
