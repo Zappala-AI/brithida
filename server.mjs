@@ -43,6 +43,23 @@ async function sendWhatsAppOrder(order, storeData) {
   return { sent: true, configured: true };
 }
 
+async function retryPendingWhatsAppOrders(data) {
+  const pending = data.orders.filter(order => !order.whatsappSent).slice(-50);
+  if (!pending.length) return;
+  let changed = false;
+  for (const order of pending) {
+    try {
+      const result = await sendWhatsAppOrder(order, data);
+      if (result.sent) { order.whatsappSent = true; order.whatsappSentAt = new Date().toISOString(); changed = true; }
+      order.whatsappStatus = result.configured ? (result.sent ? 'sent' : 'failed') : 'pending_configuration';
+    } catch (error) {
+      order.whatsappStatus = 'failed';
+      console.error('Reintento de WhatsApp fallido:', error.message);
+    }
+  }
+  if (changed) await writeData(data);
+}
+
 async function serveStatic(req, res) {
   let pathname = new URL(req.url, `http://${req.headers.host}`).pathname;
   if (pathname === '/') pathname = '/index.html';
@@ -74,10 +91,12 @@ async function main() {
       if (req.method === 'POST' && url.pathname === '/api/admin/store') { if (!isAdmin(req)) return sendJson(res, 401, { error: 'No autorizado' }); const body = await readBody(req); data.config = { ...data.config, ...(body.config || {}) }; if (Array.isArray(body.products)) data.products = body.products; if (Array.isArray(body.promos)) data.promos = body.promos; await writeData(data); return sendJson(res, 200, { ok: true }); }
       if (req.method === 'POST' && url.pathname === '/api/admin/password') { if (!isAdmin(req)) return sendJson(res, 401, { error: 'No autorizado' }); const body = await readBody(req); if (!body.newPassword || String(body.newPassword).length < 8) return sendJson(res, 400, { error: 'La nueva contraseña debe tener al menos 8 caracteres' }); if (hash(body.currentPassword) !== passwordHash) return sendJson(res, 401, { error: 'Contraseña actual incorrecta' }); passwordHash = hash(body.newPassword); data.adminPasswordHash = passwordHash; await writeData(data); return sendJson(res, 200, { ok: true }); }
       if (req.method === 'POST' && url.pathname === '/api/admin/image') { if (!isAdmin(req)) return sendJson(res, 401, { error: 'No autorizado' }); const body = await readBody(req); const match = String(body.dataUrl || '').match(/^data:(image\/(?:png|jpeg|webp));base64,(.+)$/); if (!match) return sendJson(res, 400, { error: 'Imagen inválida' }); const extension = match[1].split('/')[1].replace('jpeg', 'jpg'); const filename = `${Date.now()}-${safeName(body.filename || 'imagen')}.${extension}`; await fs.writeFile(path.join(uploadsDir, filename), Buffer.from(match[2], 'base64')); return sendJson(res, 200, { url: `/uploads/${filename}` }); }
-      if (req.method === 'POST' && url.pathname === '/api/orders') { const body = await readBody(req); const order = { ...body, createdAt: new Date().toISOString() }; data.orders.push(order); await writeData(data); let whatsapp = { sent: false, configured: false }; try { whatsapp = await sendWhatsAppOrder(order, data); } catch (error) { console.error('No se pudo enviar el pedido por WhatsApp:', error.message); } return sendJson(res, 200, { ok: true, whatsapp }); }
+      if (req.method === 'POST' && url.pathname === '/api/orders') { const body = await readBody(req); const order = { ...body, createdAt: new Date().toISOString(), whatsappSent: false, whatsappStatus: 'pending' }; data.orders.push(order); let whatsapp = { sent: false, configured: false }; try { whatsapp = await sendWhatsAppOrder(order, data); } catch (error) { console.error('No se pudo enviar el pedido por WhatsApp:', error.message); } order.whatsappSent = Boolean(whatsapp.sent); order.whatsappStatus = whatsapp.sent ? 'sent' : (whatsapp.configured ? 'failed' : 'pending_configuration'); if (whatsapp.sent) order.whatsappSentAt = new Date().toISOString(); await writeData(data); return sendJson(res, 200, { ok: true, whatsapp }); }
       return serveStatic(req, res);
     } catch (error) { console.error(error); return sendJson(res, 500, { error: 'Error interno' }); }
   });
   server.listen(port, () => console.log(`BRITHIDA disponible en http://localhost:${port}`));
+  setInterval(() => retryPendingWhatsAppOrders(data).catch(error => console.error('Cola de WhatsApp:', error.message)), 60_000);
+  retryPendingWhatsAppOrders(data).catch(error => console.error('Cola de WhatsApp:', error.message));
 }
 main();
