@@ -11,14 +11,17 @@ const uploadsDir = path.join(dataDir, 'uploads');
 const port = Number(process.env.PORT || 3000);
 const initialPassword = process.env.BRITHIDA_ADMIN_PASSWORD || '';
 const sessions = new Map();
-const defaults = { config: { whatsappPhone: '', instagramUrl: '#', facebookUrl: '#', deliveryNote: 'El costo se confirma según tu zona.', localAddress: '', localHours: '', pickupText: 'También podés consultar por retiro en el local.' }, products: [], promos: [], orders: [] };
+const defaults = { config: { whatsappPhone: '5492644118290', instagramUrl: '#', facebookUrl: '#', deliveryNote: 'El costo se confirma según tu zona.', localAddress: '', localHours: '11:00 a 15:00 / 21:00 a 02:30', pickupText: 'También podés consultar por retiro en el local.' }, products: [], promos: [], orders: [] };
 const hash = value => crypto.createHash('sha256').update(String(value)).digest('hex');
 let passwordHash = '';
 
 async function readData() {
   try {
     const saved = JSON.parse(await fs.readFile(dataFile, 'utf8'));
-    return { ...defaults, ...saved, config: { ...defaults.config, ...(saved.config || {}) }, products: Array.isArray(saved.products) ? saved.products : [], promos: Array.isArray(saved.promos) ? saved.promos : [], orders: Array.isArray(saved.orders) ? saved.orders : [] };
+    const config = { ...defaults.config, ...(saved.config || {}) };
+    if (!String(config.whatsappPhone || '').trim()) config.whatsappPhone = defaults.config.whatsappPhone;
+    if (!String(config.localHours || '').trim()) config.localHours = defaults.config.localHours;
+    return { ...defaults, ...saved, config, products: Array.isArray(saved.products) ? saved.products : [], promos: Array.isArray(saved.promos) ? saved.promos : [], orders: Array.isArray(saved.orders) ? saved.orders : [] };
   } catch { return structuredClone(defaults); }
 }
 async function writeData(data) { await fs.mkdir(dataDir, { recursive: true }); await fs.writeFile(dataFile, JSON.stringify(data, null, 2), 'utf8'); }
